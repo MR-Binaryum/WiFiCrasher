@@ -31,7 +31,7 @@ _________________________
 
 git clone https://github.com/MR-Binaryum/WiFiCrasher.git ---> Downloads the repository.
 
-cd WiFiCrasher ---> You get access to the file.
+cd WiFiCrasher ---> You get access to the folder.
 
 chmod +x WiFiCrasher.sh ----> Give permissions to execute the file.
 

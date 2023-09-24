@@ -33,6 +33,7 @@ git clone https://github.com/MR-Binaryum/WiFiCrasher.git ---> Downloads the repo
 
 cd WiFiCrasher ---> You get access to the file.
 
-chmod +x WiFiCrasher ----> Give permissions to execute the file.
+chmod +x WiFiCrasher.sh ----> Give permissions to execute the file.
+chmod +x beaconPers.sh ----> Give permissions to execute the file.
 
 sudo sh WIFICRASHER.sh ----> Execution of the file like super user (Root).

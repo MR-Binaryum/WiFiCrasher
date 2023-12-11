@@ -252,17 +252,10 @@ echo Scanning Networks...
 
 #### Files maker ####
 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null &
-airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & 
+maker(){
+sudo ./maker.sh
+}
 
-rm generated-16.kismet.csv & rm gerated-17.kismet.csv & 
 
 sleep 10 ; kill $!
 

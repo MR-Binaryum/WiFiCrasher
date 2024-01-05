@@ -1,7 +1,9 @@
+echo "put youre interface name in monitor mode in the next input"
+                                        read -p "└─────►$(tput setaf 7) " wifiInterfaceMon
 
 crafter(){
 for i in {1..100}; do
-    sudo iw dev wlo1mon interface add "mon$i" type monitor
+    sudo iw dev $wifiInterfaceMon interface add "mon$i" type monitor
     if [ $? -eq 0 ]; then
         echo "Interface mon$i crafted..."
     else

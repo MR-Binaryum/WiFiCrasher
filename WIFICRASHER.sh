@@ -567,7 +567,7 @@ BeaconFlood
 fi
 }
 
-
+#### Configuration status from networking services and monitor mode interface ####
 
 RestartFunctions(){
         
@@ -693,7 +693,7 @@ fi
 
  
 
-#### Fake Auth Attack monitor mode #### 
+#### Monitor Mode2 #### 
 
 MonitorMode2(){      
        if $AirMonitor start $Interface >> /dev/null
@@ -737,16 +737,8 @@ fi
 fi
 }
 
-#### Files maker ####
 
-maker(){
-sudo ./maker.sh
-}
-
-
-
-
-#### Monitor attacks ####
+#### MAC spoofer for monitor mode ####
 
 
 MACspooferMonitorMode(){
@@ -770,6 +762,8 @@ echo ""
 sudo rm -rf *csv
 }
 
+
+#### MAC address tracking and fingerprint  ####
 
 MACaddressTracking(){
 
@@ -843,10 +837,12 @@ rm -r mac*
 rm -fr output.txt generated-01.kismet.csv resultsMACS.txt
 echo ""
 echo "starting Tracking 2"
+echo "Tracking 2 in develop..."
 sleep 3
              
 }
 
+#### Interface conf check ####
 
 interfaceconfcheck(){
 
@@ -862,6 +858,7 @@ iw list
 echo ""
 }
 
+#### Functions call ####
 
 FuncioRecon(){
 Banner    

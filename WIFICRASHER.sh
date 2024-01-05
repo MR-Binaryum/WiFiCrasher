@@ -283,7 +283,7 @@ else
 fi
 }
 
-
+#### Street Deauth ####
 
 StreetDeauth(){
 
@@ -313,6 +313,8 @@ echo
 echo "$purple"Attack "$green"COMLETED to 100% "$purple"finishing tool tasks"$purple"
 }
 
+
+#### Fake Auth Attacks ####
 
 AuthDoSAttacks(){
 
@@ -357,6 +359,8 @@ AuthDoSAttacks(){
 fi
 }
 
+#### Fake Auth to AP ####
+
 FakeAuthAP(){
 fakeMAC=E6:EF:59:81:6A:DD
 MonitorMode2
@@ -375,7 +379,7 @@ sudo $Tool -e $AirDumper --bssid $AP $wifiInterfaceMon
 
 }
 
-
+#### DOS Fake Auth to AP ####
 
 DoSAuthAP(){
 numINT=100
@@ -406,17 +410,23 @@ done
 sudo $Tool -e $AirDumper --bssid $AP $wifiInterfaceMon                           
 }
 
+#### DOS Fake Auth to Range channel AP ####
+
 DoSRangeAuthAP(){
 
 echo $purple "╭─"$green"Select Attack mode (-_-) "$purple
                            read -p " ╰─$ " auth
-
+echo "in develop..."
 }
+
+#### DOS Fake Auth to all 2.4GHz band ####
 
 DoSAllAuthAP(){
 
-echo in develop
+echo "in develop..."
 }
+
+#### Rogue AP attacks ####
 
 RogueAPsAttacks(){
 
@@ -456,13 +466,19 @@ RogueAPsAttacks(){
 fi
 }
 
+#### Rogue1AP ####
+
 Rogue1AP(){
         echo "in develop..."
 }
 
+#### RangeRogueAP ####
+
 RangeRogueAP(){
         echo "in develop..."
 }
+
+#### All 2.4GHz band RogueAP attack ####
 
 AllRogueAP(){
         echo "in develop..."
@@ -852,3 +868,4 @@ Banner
 Menuoption
 }     
 FuncioRecon                                                  
+

